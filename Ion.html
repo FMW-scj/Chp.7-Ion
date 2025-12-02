@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HKDSE Chemistry Ion Master</title>
+    
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Noto+Serif:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* 3D Flip Animation Utilities */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+        
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .animate-shake {
+            animation: shake 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // --- Icon Components (Inline SVGs to prevent CDN dependency errors) ---
+        const IconBase = ({ children, ...props }) => (
+            <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="24" 
+                height="24" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                {...props}
+            >
+                {children}
+            </svg>
+        );
+
+        const BookOpen = (props) => (
+            <IconBase {...props}>
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+            </IconBase>
+        );
+        const Brain = (props) => (
+            <IconBase {...props}>
+                <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z" /><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z" />
+            </IconBase>
+        );
+        const RotateCcw = (props) => (
+            <IconBase {...props}>
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" />
+            </IconBase>
+        );
+        const ChevronRight = (props) => (
+            <IconBase {...props}>
+                <path d="m9 18 6-6-6-6" />
+            </IconBase>
+        );
+        const ChevronLeft = (props) => (
+            <IconBase {...props}>
+                <path d="m15 18-6-6 6-6" />
+            </IconBase>
+        );
+        const Check = (props) => (
+            <IconBase {...props}>
+                <path d="M20 6 9 17l-5-5" />
+            </IconBase>
+        );
+        const X = (props) => (
+            <IconBase {...props}>
+                <path d="M18 6 6 18" /><path d="m6 6 18 18" />
+            </IconBase>
+        );
+        const Trophy = (props) => (
+            <IconBase {...props}>
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" /><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" /><path d="M4 22h16" /><path d="M10 14.66V17" /><path d="M14 14.66V17" /><path d="M18 2h-5.5a5.5 5.5 0 0 1-5.5 5.5V11a5.5 5.5 0 0 0 5.5 5.5h1a5.5 5.5 0 0 0 5.5-5.5V7.5A5.5 5.5 0 0 1 18 2Z" />
+            </IconBase>
+        );
+        const AlertCircle = (props) => (
+            <IconBase {...props}>
+                <circle cx="12" cy="12" r="10" /><line x1="12" x2="12" y1="8" y2="12" /><line x1="12" x2="12.01" y1="16" y2="16" />
+            </IconBase>
+        );
+        const Home = (props) => (
+            <IconBase {...props}>
+                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
+            </IconBase>
+        );
+        const Grid = (props) => (
+            <IconBase {...props}>
+                <rect width="7" height="7" x="3" y="3" rx="1" /><rect width="7" height="7" x="14" y="3" rx="1" /><rect width="7" height="7" x="14" y="14" rx="1" /><rect width="7" height="7" x="3" y="14" rx="1" />
+            </IconBase>
+        );
+        const Timer = (props) => (
+            <IconBase {...props}>
+                <line x1="10" x2="14" y1="2" y2="2" /><line x1="12" x2="15" y1="14" y2="11" /><circle cx="12" cy="14" r="8" />
+            </IconBase>
+        );
+
+        // --- Main App Component ---
+        const ChemistryApp = () => {
+            const [view, setView] = React.useState('home'); // home, flashcards, quiz, matching, results
+            const [ions, setIons] = React.useState([]);
+
+            // Data extraction from the user's images
+            const rawData = [
+                { id: 1, name: "Lithium ion", formula: "Li⁺", html: "Li<sup>+</sup>" },
+                { id: 2, name: "Sodium ion", formula: "Na⁺", html: "Na<sup>+</sup>" },
+                { id: 3, name: "Potassium ion", formula: "K⁺", html: "K<sup>+</sup>" },
+                { id: 4, name: "Magnesium ion", formula: "Mg²⁺", html: "Mg<sup>2+</sup>" },
+                { id: 5, name: "Calcium ion", formula: "Ca²⁺", html: "Ca<sup>2+</sup>" },
+                { id: 6, name: "Aluminium ion", formula: "Al³⁺", html: "Al<sup>3+</sup>" },
+                { id: 7, name: "Nitride ion", formula: "N³⁻", html: "N<sup>3-</sup>" },
+                { id: 8, name: "Phosphide ion", formula: "P³⁻", html: "P<sup>3-</sup>" },
+                { id: 9, name: "Oxide ion", formula: "O²⁻", html: "O<sup>2-</sup>" },
+                { id: 10, name: "Sulphide ion", formula: "S²⁻", html: "S<sup>2-</sup>" },
+                { id: 11, name: "Fluoride ion", formula: "F⁻", html: "F<sup>-</sup>" },
+                { id: 12, name: "Chloride ion", formula: "Cl⁻", html: "Cl<sup>-</sup>" },
+                { id: 13, name: "Bromide ion", formula: "Br⁻", html: "Br<sup>-</sup>" },
+                { id: 14, name: "Iodide ion", formula: "I⁻", html: "I<sup>-</sup>" },
+                { id: 15, name: "Silver ion", formula: "Ag⁺", html: "Ag<sup>+</sup>" },
+                { id: 16, name: "Zinc ion", formula: "Zn²⁺", html: "Zn<sup>2+</sup>" },
+                { id: 17, name: "Iron(II) ion", formula: "Fe²⁺", html: "Fe<sup>2+</sup>" },
+                { id: 18, name: "Nickel(II) ion", formula: "Ni²⁺", html: "Ni<sup>2+</sup>" },
+                { id: 19, name: "Copper(II) ion", formula: "Cu²⁺", html: "Cu<sup>2+</sup>" },
+                { id: 20, name: "Iron(III) ion", formula: "Fe³⁺", html: "Fe<sup>3+</sup>" },
+                { id: 21, name: "Chromium(III) ion", formula: "Cr³⁺", html: "Cr<sup>3+</sup>" },
+                { id: 22, name: "Hydrogen ion", formula: "H⁺", html: "H<sup>+</sup>" },
+                { id: 23, name: "Hydride ion", formula: "H⁻", html: "H<sup>-</sup>" },
+                { id: 24, name: "Ammonium ion", formula: "NH₄⁺", html: "NH<sub>4</sub><sup>+</sup>" },
+                { id: 25, name: "Hydroxide ion", formula: "OH⁻", html: "OH<sup>-</sup>" },
+                { id: 26, name: "Nitrate ion", formula: "NO₃⁻", html: "NO<sub>3</sub><sup>-</sup>" },
+                { id: 27, name: "Nitrite ion", formula: "NO₂⁻", html: "NO<sub>2</sub><sup>-</sup>" },
+                { id: 28, name: "Hydrogencarbonate ion", formula: "HCO₃⁻", html: "HCO<sub>3</sub><sup>-</sup>" },
+                { id: 29, name: "Carbonate ion", formula: "CO₃²⁻", html: "CO<sub>3</sub><sup>2-</sup>" },
+                { id: 30, name: "Sulphate ion", formula: "SO₄²⁻", html: "SO<sub>4</sub><sup>2-</sup>" },
+                { id: 31, name: "Sulphite ion", formula: "SO₃²⁻", html: "SO<sub>3</sub><sup>2-</sup>" },
+                { id: 32, name: "Permanganate ion", formula: "MnO₄⁻", html: "MnO<sub>4</sub><sup>-</sup>" },
+                { id: 33, name: "Dichromate ion", formula: "Cr₂O₇²⁻", html: "Cr<sub>2</sub>O<sub>7</sub><sup>2-</sup>" },
+            ];
+
+            React.useEffect(() => {
+                setIons(rawData);
+            }, []);
+
+            const navigateTo = (newView) => {
+                setView(newView);
+                window.scrollTo(0, 0);
+            };
+
+            return (
+                <div className="min-h-screen bg-slate-50 font-sans text-slate-800 pb-12">
+                    <nav className="bg-indigo-600 text-white p-4 shadow-md sticky top-0 z-50">
+                        <div className="max-w-4xl mx-auto flex justify-between items-center">
+                            <div 
+                                className="text-xl font-bold flex items-center gap-2 cursor-pointer select-none" 
+                                onClick={() => navigateTo('home')}
+                            >
+                                <Brain className="w-6 h-6" />
+                                <span className="hidden sm:inline">HKDSE Ion Master</span>
+                                <span className="sm:hidden">Ion Master</span>
+                            </div>
+                            {view !== 'home' && (
+                                <button 
+                                    onClick={() => navigateTo('home')}
+                                    className="text-sm bg-indigo-500 hover:bg-indigo-400 px-3 py-1 rounded transition-colors flex items-center gap-1 shadow-sm"
+                                >
+                                    <Home className="w-4 h-4" /> Home
+                                </button>
+                            )}
+                        </div>
+                    </nav>
+
+                    <main className="max-w-4xl mx-auto p-4 md:p-6">
+                        {view === 'home' && <HomeScreen onNavigate={navigateTo} />}
+                        {view === 'flashcards' && <FlashcardMode ions={ions} />}
+                        {view === 'quiz' && <QuizMode ions={ions} onFinish={() => navigateTo('results')} />}
+                        {view === 'matching' && <MatchingMode ions={ions} />}
+                    </main>
+                </div>
+            );
+        };
+
+        const HomeScreen = ({ onNavigate }) => (
+            <div className="flex flex-col items-center justify-center py-6 text-center space-y-8 animate-fade-in">
+                <div className="space-y-4">
+                    <h1 className="text-4xl md:text-5xl font-extrabold text-indigo-900 tracking-tight">
+                        Master Your Ions
+                    </h1>
+                    <p className="text-lg text-slate-600 max-w-lg mx-auto leading-relaxed">
+                        Ace your F.3 Chemistry exams! Review the names and formulas of common cations and anions found in the HKDSE syllabus.
+                    </p>
+                </div>
+
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-4xl mt-4 px-2">
+                    <MenuCard 
+                        onClick={() => onNavigate('flashcards')}
+                        icon={BookOpen}
+                        title="Flash Cards"
+                        desc="Flip through all 33 ions to memorize names and formulas."
+                        color="indigo"
+                    />
+                    <MenuCard 
+                        onClick={() => onNavigate('matching')}
+                        icon={Grid}
+                        title="Matching Game"
+                        desc="Race against the clock to match names with their formulas!"
+                        color="amber"
+                    />
+                    <MenuCard 
+                        onClick={() => onNavigate('quiz')}
+                        icon={Trophy}
+                        title="Quiz Challenge"
+                        desc="Test your memory with randomized questions."
+                        color="emerald"
+                    />
+                </div>
+                
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-8 max-w-lg w-full text-left flex gap-3">
+                    <AlertCircle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                        <p className="text-sm text-blue-800 font-bold mb-1">Quick Tip:</p>
+                        <p className="text-sm text-blue-700 leading-relaxed">
+                            Remember: <strong>-ate</strong> means "contains oxygen" (e.g. Sulphate), while <strong>-ide</strong> usually means just the element itself (e.g. Sulphide).
+                        </p>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const MenuCard = ({ onClick, icon: Icon, title, desc, color }) => {
+            const colorClasses = {
+                indigo: "hover:border-indigo-300 text-indigo-600 bg-indigo-100",
+                emerald: "hover:border-emerald-300 text-emerald-600 bg-emerald-100",
+                amber: "hover:border-amber-300 text-amber-600 bg-amber-100",
+            };
+
+            return (
+                <div 
+                    onClick={onClick}
+                    className={`group relative bg-white p-6 rounded-2xl shadow-lg border-2 border-transparent hover:shadow-xl transition-all cursor-pointer overflow-hidden transform hover:-translate-y-1 ${colorClasses[color].split(" ")[0]}`}
+                >
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <Icon className={`w-24 h-24 ${colorClasses[color].split(" ")[1]}`} />
+                    </div>
+                    <div className="flex flex-col items-center relative z-10">
+                        <div className={`w-14 h-14 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform ${colorClasses[color].split(" ")[2]}`}>
+                            <Icon className={`w-7 h-7 ${colorClasses[color].split(" ")[1]}`} />
+                        </div>
+                        <h2 className="text-xl font-bold text-slate-800 mb-2">{title}</h2>
+                        <p className="text-slate-500 text-sm leading-snug">{desc}</p>
+                    </div>
+                </div>
+            );
+        };
+
+        const FlashcardMode = ({ ions }) => {
+            const [currentIndex, setCurrentIndex] = React.useState(0);
+            const [isFlipped, setIsFlipped] = React.useState(false);
+            const [shuffledIons, setShuffledIons] = React.useState([...ions]);
+
+            const handleNext = () => {
+                setIsFlipped(false);
+                setTimeout(() => {
+                    setCurrentIndex((prev) => (prev + 1) % shuffledIons.length);
+                }, 150);
+            };
+
+            const handlePrev = () => {
+                setIsFlipped(false);
+                setTimeout(() => {
+                    setCurrentIndex((prev) => (prev - 1 + shuffledIons.length) % shuffledIons.length);
+                }, 150);
+            };
+
+            const handleShuffle = () => {
+                setIsFlipped(false);
+                setTimeout(() => {
+                    setShuffledIons([...ions].sort(() => Math.random() - 0.5));
+                    setCurrentIndex(0);
+                }, 300);
+            };
+
+            const currentIon = shuffledIons[currentIndex];
+
+            React.useEffect(() => {
+                const handleKeyDown = (e) => {
+                    if (e.key === 'ArrowRight') handleNext();
+                    if (e.key === 'ArrowLeft') handlePrev();
+                    if (e.key === ' ' || e.key === 'Enter') setIsFlipped(prev => !prev);
+                };
+                window.addEventListener('keydown', handleKeyDown);
+                return () => window.removeEventListener('keydown', handleKeyDown);
+            }, [shuffledIons]);
+
+            return (
+                <div className="flex flex-col items-center py-6 min-h-[60vh]">
+                    <div className="flex justify-between w-full max-w-md mb-6 px-2">
+                        <span className="text-slate-500 font-medium">Card {currentIndex + 1} / {shuffledIons.length}</span>
+                        <button onClick={handleShuffle} className="text-indigo-600 font-semibold hover:underline flex items-center gap-1 hover:bg-indigo-50 px-2 py-1 rounded">
+                            <RotateCcw className="w-4 h-4" /> Shuffle
+                        </button>
+                    </div>
+
+                    <div 
+                        className="perspective-1000 w-full max-w-md h-72 cursor-pointer group select-none touch-manipulation" 
+                        onClick={() => setIsFlipped(!isFlipped)}
+                    >
+                        <div className={`relative w-full h-full transition-all duration-500 transform-style-3d shadow-xl rounded-2xl ${isFlipped ? 'rotate-y-180' : ''}`}>
+                            
+                            {/* Front */}
+                            <div className="absolute w-full h-full bg-white rounded-2xl flex flex-col items-center justify-center backface-hidden border-2 border-indigo-100 p-6">
+                                <span className="text-slate-400 text-xs uppercase tracking-widest font-bold mb-4">Ion Name</span>
+                                <h2 className="text-3xl font-bold text-slate-800 text-center leading-tight">{currentIon.name}</h2>
+                                <span className="mt-8 text-indigo-500 text-sm animate-pulse">Tap to reveal formula</span>
+                            </div>
+
+                            {/* Back */}
+                            <div className="absolute w-full h-full bg-indigo-600 rounded-2xl flex flex-col items-center justify-center backface-hidden rotate-y-180 text-white p-6 shadow-inner">
+                                <span className="text-indigo-200 text-xs uppercase tracking-widest font-bold mb-4">Chemical Formula</span>
+                                <div 
+                                    className="text-5xl font-serif font-bold tracking-wider"
+                                    dangerouslySetInnerHTML={{ __html: currentIon.html }}
+                                />
+                                <span className="mt-8 text-indigo-200 text-sm">Tap to see name</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex gap-4 mt-10">
+                        <button onClick={handlePrev} className="p-4 rounded-full bg-white shadow-md hover:bg-slate-50 border border-slate-200 transition-transform active:scale-95 group">
+                            <ChevronLeft className="w-6 h-6 text-slate-600 group-hover:text-indigo-600" />
+                        </button>
+                        <button onClick={handleNext} className="p-4 rounded-full bg-white shadow-md hover:bg-slate-50 border border-slate-200 transition-transform active:scale-95 group">
+                            <ChevronRight className="w-6 h-6 text-slate-600 group-hover:text-indigo-600" />
+                        </button>
+                    </div>
+                    <p className="text-xs text-slate-400 mt-4">Use Arrow Keys or Tap to navigate</p>
+                </div>
+            );
+        };
+
+        const MatchingMode = ({ ions }) => {
+            const [cards, setCards] = React.useState([]);
+            const [selectedCards, setSelectedCards] = React.useState([]);
+            const [matchedPairs, setMatchedPairs] = React.useState([]);
+            const [timer, setTimer] = React.useState(0);
+            const [gameStatus, setGameStatus] = React.useState('start'); // start, playing, won
+            const timerRef = React.useRef(null);
+
+            // Constants
+            const PAIRS_COUNT = 6; 
+
+            const startGame = () => {
+                // 1. Pick random ions
+                const shuffledIons = [...ions].sort(() => Math.random() - 0.5).slice(0, PAIRS_COUNT);
+                
+                // 2. Create card pairs (Name and Formula)
+                const gameCards = [];
+                shuffledIons.forEach(ion => {
+                    gameCards.push({
+                        id: `name-${ion.id}`,
+                        ionId: ion.id,
+                        type: 'name',
+                        content: ion.name,
+                        displayHtml: null
+                    });
+                    gameCards.push({
+                        id: `formula-${ion.id}`,
+                        ionId: ion.id,
+                        type: 'formula',
+                        content: ion.formula,
+                        displayHtml: ion.html
+                    });
+                });
+
+                // 3. Shuffle cards
+                setCards(gameCards.sort(() => Math.random() - 0.5));
+                
+                // 4. Reset state
+                setMatchedPairs([]);
+                setSelectedCards([]);
+                setTimer(0);
+                setGameStatus('playing');
+                
+                // 5. Start Timer
+                if (timerRef.current) clearInterval(timerRef.current);
+                timerRef.current = setInterval(() => {
+                    setTimer(t => t + 1);
+                }, 100); // 0.1s resolution
+            };
+
+            React.useEffect(() => {
+                return () => {
+                    if (timerRef.current) clearInterval(timerRef.current);
+                };
+            }, []);
+
+            React.useEffect(() => {
+                if (gameStatus === 'playing' && matchedPairs.length === PAIRS_COUNT) {
+                    clearInterval(timerRef.current);
+                    setGameStatus('won');
+                }
+            }, [matchedPairs, gameStatus]);
+
+            const handleCardClick = (card) => {
+                if (gameStatus !== 'playing') return;
+                if (matchedPairs.includes(card.ionId)) return; // Already matched
+                if (selectedCards.find(c => c.id === card.id)) return; // Already selected
+                if (selectedCards.length >= 2) return; // Wait for clear
+
+                const newSelected = [...selectedCards, card];
+                setSelectedCards(newSelected);
+
+                if (newSelected.length === 2) {
+                    // Check match
+                    const [card1, card2] = newSelected;
+                    if (card1.ionId === card2.ionId) {
+                        // Match found
+                        setTimeout(() => {
+                            setMatchedPairs(prev => [...prev, card1.ionId]);
+                            setSelectedCards([]);
+                        }, 300);
+                    } else {
+                        // No match
+                        setTimeout(() => {
+                            setSelectedCards([]);
+                        }, 1000);
+                    }
+                }
+            };
+
+            const formatTime = (t) => (t / 10).toFixed(1);
+
+            if (gameStatus === 'start') {
+                return (
+                    <div className="flex flex-col items-center justify-center py-12 text-center bg-white rounded-2xl shadow-sm border border-slate-100">
+                        <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mb-6">
+                            <Grid className="w-10 h-10 text-amber-600" />
+                        </div>
+                        <h2 className="text-3xl font-bold text-slate-800 mb-2">Matching Game</h2>
+                        <p className="text-slate-600 mb-8 max-w-md">
+                            Match the Ion Name with its correct Chemical Formula as fast as you can!
+                        </p>
+                        <button 
+                            onClick={startGame}
+                            className="bg-amber-500 hover:bg-amber-400 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform active:scale-95 flex items-center gap-2"
+                        >
+                            Start Game <ChevronRight className="w-5 h-5" />
+                        </button>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="max-w-2xl mx-auto">
+                    {/* Header */}
+                    <div className="flex justify-between items-center mb-6 px-2">
+                        <div className="flex items-center gap-2 text-slate-600 font-semibold">
+                            <Timer className="w-5 h-5" />
+                            <span className="text-xl tabular-nums">{formatTime(timer)}s</span>
+                        </div>
+                        <button onClick={startGame} className="text-sm text-slate-500 hover:text-indigo-600 flex items-center gap-1">
+                            <RotateCcw className="w-4 h-4" /> Restart
+                        </button>
+                    </div>
+
+                    {/* Grid */}
+                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 sm:gap-4 select-none">
+                        {cards.map(card => {
+                            const isMatched = matchedPairs.includes(card.ionId);
+                            const isSelected = selectedCards.find(c => c.id === card.id);
+                            const isWrong = selectedCards.length === 2 && isSelected && selectedCards[0].ionId !== selectedCards[1].ionId;
+
+                            let cardClass = "bg-white border-slate-200 text-slate-600 hover:border-indigo-300"; // default
+                            if (isSelected) cardClass = "bg-indigo-50 border-indigo-500 text-indigo-700 ring-2 ring-indigo-200";
+                            if (isWrong) cardClass = "bg-red-50 border-red-500 text-red-700 animate-shake";
+                            if (isMatched) cardClass = "bg-green-50 border-green-500 text-green-700 opacity-0 pointer-events-none transform scale-90"; // Vanish effect
+
+                            return (
+                                <div 
+                                    key={card.id}
+                                    onClick={() => handleCardClick(card)}
+                                    className={`
+                                        relative h-24 sm:h-28 rounded-xl border-2 shadow-sm flex items-center justify-center p-2 text-center cursor-pointer transition-all duration-300
+                                        ${cardClass}
+                                    `}
+                                >
+                                    {card.type === 'formula' ? (
+                                        <span className="font-serif font-bold text-lg sm:text-xl" dangerouslySetInnerHTML={{__html: card.displayHtml}} />
+                                    ) : (
+                                        <span className="font-bold text-xs sm:text-sm">{card.content}</span>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* Win State Overlay */}
+                    {gameStatus === 'won' && (
+                        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-fade-in">
+                            <div className="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl transform scale-100">
+                                <Trophy className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
+                                <h2 className="text-2xl font-bold text-slate-800 mb-2">Matched!</h2>
+                                <p className="text-slate-600 mb-6">You cleared the board in <strong className="text-indigo-600 text-xl">{formatTime(timer)}s</strong></p>
+                                <button 
+                                    onClick={startGame}
+                                    className="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-500 transition-colors"
+                                >
+                                    Play Again
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const QuizMode = ({ ions, onFinish }) => {
+            const [gameState, setGameState] = React.useState('intro'); // intro, playing, finished
+            const [questions, setQuestions] = React.useState([]);
+            const [currentQIndex, setCurrentQIndex] = React.useState(0);
+            const [score, setScore] = React.useState(0);
+            const [selectedOption, setSelectedOption] = React.useState(null);
+            const [isAnswered, setIsAnswered] = React.useState(false);
+            const [mistakes, setMistakes] = React.useState([]);
+
+            // Setup Quiz
+            const startQuiz = () => {
+                // Generate questions: Shuffle ions, take random 15 (or all)
+                const shuffled = [...ions].sort(() => Math.random() - 0.5).slice(0, 15);
+                
+                const quizQuestions = shuffled.map(correctIon => {
+                    // Generate 3 distractors
+                    const distractors = ions
+                        .filter(ion => ion.id !== correctIon.id)
+                        .sort(() => Math.random() - 0.5)
+                        .slice(0, 3);
+                    
+                    const options = [...distractors, correctIon].sort(() => Math.random() - 0.5);
+                    
+                    return {
+                        ion: correctIon,
+                        options
+                    };
+                });
+
+                setQuestions(quizQuestions);
+                setGameState('playing');
+                setCurrentQIndex(0);
+                setScore(0);
+                setMistakes([]);
+                setIsAnswered(false);
+                setSelectedOption(null);
+            };
+
+            const handleOptionClick = (option) => {
+                if (isAnswered) return;
+                setSelectedOption(option);
+                setIsAnswered(true);
+
+                const isCorrect = option.id === questions[currentQIndex].ion.id;
+                if (isCorrect) {
+                    setScore(s => s + 1);
+                } else {
+                    setMistakes(prev => [...prev, { 
+                        question: questions[currentQIndex].ion, 
+                        yourAnswer: option,
+                        correctAnswer: questions[currentQIndex].ion
+                    }]);
+                }
+            };
+
+            const nextQuestion = () => {
+                if (currentQIndex < questions.length - 1) {
+                    setCurrentQIndex(prev => prev + 1);
+                    setIsAnswered(false);
+                    setSelectedOption(null);
+                } else {
+                    setGameState('finished');
+                }
+            };
+
+            if (gameState === 'intro') {
+                return (
+                    <div className="flex flex-col items-center justify-center py-12 text-center bg-white rounded-2xl shadow-sm border border-slate-100">
+                        <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mb-6">
+                            <Brain className="w-10 h-10 text-emerald-600" />
+                        </div>
+                        <h2 className="text-3xl font-bold text-slate-800 mb-2">Quiz Challenge</h2>
+                        <p className="text-slate-600 mb-8 max-w-md">
+                            You'll get 15 random questions. Identify the correct formula for each ion name.
+                        </p>
+                        <button 
+                            onClick={startQuiz}
+                            className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform active:scale-95 flex items-center gap-2"
+                        >
+                            Start Quiz <ChevronRight className="w-5 h-5" />
+                        </button>
+                    </div>
+                );
+            }
+
+            if (gameState === 'finished') {
+                const percentage = Math.round((score / questions.length) * 100);
+                let feedbackMsg = "";
+                if (percentage === 100) feedbackMsg = "Perfect Score! You are a Chemistry Master! 🧪✨";
+                else if (percentage >= 80) feedbackMsg = "Great job! You know your ions well! 🔥";
+                else if (percentage >= 50) feedbackMsg = "Good effort! Review the ones you missed. 📚";
+                else feedbackMsg = "Keep practicing! Use the Flashcards to study. 💪";
+
+                return (
+                    <div className="bg-white rounded-2xl shadow-lg p-8 max-w-2xl mx-auto animate-fade-in">
+                        <div className="text-center mb-8">
+                            <div className="inline-block p-4 rounded-full bg-yellow-50 mb-4">
+                                <Trophy className={`w-12 h-12 ${percentage === 100 ? 'text-yellow-500' : 'text-slate-400'}`} />
+                            </div>
+                            <h2 className="text-3xl font-bold text-slate-800 mb-2">Quiz Complete!</h2>
+                            <div className="text-5xl font-extrabold text-indigo-600 my-4">{score} / {questions.length}</div>
+                            <p className="text-lg text-slate-600 font-medium">{feedbackMsg}</p>
+                        </div>
+
+                        {mistakes.length > 0 && (
+                            <div className="mt-8 border-t border-slate-100 pt-6">
+                                <h3 className="text-xl font-bold text-slate-700 mb-4 flex items-center gap-2">
+                                    <AlertCircle className="w-5 h-5 text-red-500" /> Review Mistakes
+                                </h3>
+                                <div className="space-y-4">
+                                    {mistakes.map((m, idx) => (
+                                        <div key={idx} className="bg-red-50 rounded-lg p-4 border border-red-100">
+                                            <p className="font-bold text-slate-800 mb-2">{m.question.name}</p>
+                                            <div className="flex justify-between items-center text-sm">
+                                                <div className="flex-1">
+                                                    <span className="block text-red-600 font-semibold mb-1">Your Answer:</span>
+                                                    <span className="font-serif text-lg" dangerouslySetInnerHTML={{__html: m.yourAnswer.html}}></span>
+                                                </div>
+                                                <div className="flex-1 text-right">
+                                                    <span className="block text-green-600 font-semibold mb-1">Correct Answer:</span>
+                                                    <span className="font-serif text-lg font-bold text-green-700" dangerouslySetInnerHTML={{__html: m.correctAnswer.html}}></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="mt-8 flex justify-center gap-4">
+                            <button onClick={startQuiz} className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-500 transition-colors flex items-center gap-2">
+                                <RotateCcw className="w-4 h-4" /> Try Again
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            // Playing State
+            const currentQ = questions[currentQIndex];
+            
+            return (
+                <div className="w-full max-w-xl mx-auto">
+                    {/* Progress Bar */}
+                    <div className="w-full bg-slate-200 h-2 rounded-full mb-6">
+                        <div 
+                            className="bg-indigo-600 h-2 rounded-full transition-all duration-300" 
+                            style={{ width: `${((currentQIndex + 1) / questions.length) * 100}%` }}
+                        ></div>
+                    </div>
+
+                    <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-slate-100 min-h-[400px] flex flex-col">
+                        <div className="flex justify-between items-start mb-6">
+                            <span className="text-sm font-bold text-indigo-500 tracking-wide">QUESTION {currentQIndex + 1}/{questions.length}</span>
+                            <span className="text-sm font-semibold text-slate-400">Score: {score}</span>
+                        </div>
+
+                        <h3 className="text-2xl font-bold text-slate-800 mb-8 text-center">
+                            What is the formula for <br />
+                            <span className="text-indigo-600 mt-2 block text-3xl">{currentQ.ion.name}?</span>
+                        </h3>
+
+                        <div className="grid grid-cols-1 gap-3 flex-grow">
+                            {currentQ.options.map((option) => {
+                                let btnClass = "border-2 border-slate-100 bg-slate-50 hover:border-indigo-300 hover:bg-indigo-50"; // Default
+                                
+                                if (isAnswered) {
+                                    if (option.id === currentQ.ion.id) {
+                                        btnClass = "border-2 border-green-500 bg-green-50 text-green-800"; // Correct
+                                    } else if (option.id === selectedOption.id) {
+                                        btnClass = "border-2 border-red-400 bg-red-50 text-red-800"; // Wrong selected
+                                    } else {
+                                        btnClass = "opacity-50 border-slate-100 bg-slate-50"; // Others
+                                    }
+                                }
+
+                                return (
+                                    <button
+                                        key={option.id}
+                                        onClick={() => handleOptionClick(option)}
+                                        disabled={isAnswered}
+                                        className={`p-4 rounded-xl text-left transition-all duration-200 flex justify-between items-center group ${btnClass}`}
+                                    >
+                                        <span className="font-serif text-xl font-medium" dangerouslySetInnerHTML={{ __html: option.html }}></span>
+                                        
+                                        {isAnswered && option.id === currentQ.ion.id && <Check className="w-5 h-5 text-green-600" />}
+                                        {isAnswered && option.id === selectedOption.id && option.id !== currentQ.ion.id && <X className="w-5 h-5 text-red-500" />}
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        {isAnswered && (
+                            <div className="mt-6 animate-fade-in flex justify-end">
+                                <button 
+                                    onClick={nextQuestion}
+                                    className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2 rounded-lg font-bold shadow-md transition-transform active:scale-95 flex items-center gap-2"
+                                >
+                                    {currentQIndex === questions.length - 1 ? 'Finish' : 'Next Question'} <ChevronRight className="w-4 h-4" />
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<ChemistryApp />);
+    </script>
+</body>
+</html>
